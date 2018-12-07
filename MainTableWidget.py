@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QWidget, QTabWidget,QVBoxLayout, QListWidget, QCheck
 from AddFunctionWidget import AddFunctionWidget
 from FunctionPlotWidget import FunctionPlotWidget
 from SolidRevWidget import SolidRevWidget
+from CalculateVolumeWidget import CalculateVolumeWidget
 from GlobalVariables import GlobalVariables
 
 
@@ -18,11 +19,13 @@ class MainTableWidget(QWidget):
         self.tab1 = AddFunctionWidget(self)
         self.tab2 = FunctionPlotWidget(self)
         self.tab3 = SolidRevWidget(self)
+        self.tab4 = CalculateVolumeWidget(self)
         
         # Add tabs
         self.tabs.addTab(self.tab1,"Agrega Funciones")
         self.tabs.addTab(self.tab2,"Ver Función")
         self.tabs.addTab(self.tab3,"Ver Sólido de Revolución")
+        self.tabs.addTab(self.tab4,"Cálculo de Volumen")
         
         # Add tabs to widget        
         self.layout.addWidget(self.tabs)
@@ -71,8 +74,9 @@ class MainTableWidget(QWidget):
                 GlobalVariables.selectedIndex = 0
                 self.tab2.updatePlot()
                 self.tab3.updatePlot()
-                
-            newCheckBox.stateChanged.connect(self.selectFunction)
+                self.tab4.updatePlot()
+
+            newCheckBox.pressed.connect(self.selectFunction)
             self.checkBoxGroup.addButton(newCheckBox, listLength - 1)
             
         self.layout.addLayout(self.checkBoxLayout)
@@ -83,3 +87,4 @@ class MainTableWidget(QWidget):
         GlobalVariables.selectedIndex = self.checkBoxGroup.checkedId()
         self.tab2.updatePlot()
         self.tab3.updatePlot()
+        self.tab4.updatePlot()

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d.axes3d as axes3d
 
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QSizePolicy
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
@@ -18,7 +18,12 @@ class SolidRevPlot(FigureCanvas):
 
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
-
+            
+        FigureCanvas.setSizePolicy(self,
+                QSizePolicy.Expanding,
+                QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+        
         u = np.linspace(0, 2, 60)
         v = np.linspace(0, 2*np.pi, 60)
         self.U, self.V = np.meshgrid(u, v)
