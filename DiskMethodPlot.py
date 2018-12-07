@@ -1,3 +1,5 @@
+from sympy import var
+
 import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d.axes3d as axes3d
@@ -13,6 +15,8 @@ from GlobalVariables import GlobalVariables
 class DiskMethodPlot(FigureCanvas, QWidget):
 
     def __init__(self, parent=None):
+        
+        self.function_points = 60
         
         # Force a minimum of 1 disk
         if(parent.input_section.text()=='' or int(parent.input_section.text())==0):
@@ -30,36 +34,30 @@ class DiskMethodPlot(FigureCanvas, QWidget):
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
 
-        self.v = np.linspace(0, 2*np.pi, 60)
+        self.v = np.linspace(0, 2*np.pi, self.function_points)
         self.plot()
         
     def plot(self):
-        
+
         mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
-        d = mathFunction.f_params_dict
+        deltaX = (GlobalVariables.x1 - GlobalVariables.x0)/self.diskAmount                # Calculate X coordinate difference of rectangles
         
-        # Calculate X coordinate difference of rectangles
-        deltaX = (GlobalVariables.x1 - GlobalVariables.x0)/self.diskAmount
-        
-        for i in range(self.diskAmount):
-            
+        for i in range(self.diskAmount):            
             # Calculate function value at midpoint
             midpoint = GlobalVariables.x0 + (i+0.5)*deltaX
-            
 
-            x_mid       = np.linspace(midpoint, midpoint, 60)          # All X values fixed to midpoint
-            x_range     = np.linspace(i*deltaX , (i+1)*deltaX, 60)     # X range for this cylinder
-            
-            X_mid, V   = np.meshgrid(x_mid, self.v)
+            x_range     = np.linspace(i*deltaX , (i+1)*deltaX, self.function_points)      # X range for this cylinder
             X_range, V = np.meshgrid(x_range, self.v)
-
-            if(mathFunction.f_type == "polinomial"):
-                Y = (float(d['A'])*X_mid**3 + float(d['B'])*X_mid**2 + float(d['C'])*X_mid + float(d['D'])) * np.cos(V)
-                Z = (float(d['A'])*X_mid**3 + float(d['B'])*X_mid**2 + float(d['C'])*X_mid + float(d['D'])) * np.sin(V)
-
+            
+            # Get value of function for each of the points specified in u
+            radius  = mathFunction.f_expression.subs(var('x'), midpoint)
+            F_vals = np.full((self.function_points, self.function_points), float(radius))
+            
+            Y = F_vals * np.cos(V)
+            Z = F_vals * np.sin(V)
+                
             self.ax.plot_surface(X_range, Y, Z, alpha=0.3, color='red', rstride=6, cstride=12)
             
             # Calculate volume of current cylinder
-            radius = (float(d['A'])*midpoint**3 + float(d['B'])*midpoint**2 + float(d['C'])*midpoint + float(d['D']))
             diskVolume = deltaX*math.pi*radius**2
             self.solidVolume += diskVolume
