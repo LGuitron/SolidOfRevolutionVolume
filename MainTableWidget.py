@@ -21,6 +21,12 @@ class MainTableWidget(QWidget):
         self.tab3 = SolidRevWidget(self)
         self.tab4 = CalculateVolumeWidget(self)
         
+        # Array of indices of tabs with plots (for making updates when switching to them)
+        self.tabsWithPlots = [1,2,3]
+        
+        # Function whenever a new tab is clicked
+        self.tabs.currentChanged.connect(self.updatePlot)
+        
         # Add tabs
         self.tabs.addTab(self.tab1,"Agrega Funciones")
         self.tabs.addTab(self.tab2,"Ver Función")
@@ -72,11 +78,8 @@ class MainTableWidget(QWidget):
             if(listLength==1):
                 newCheckBox.setChecked(True)
                 GlobalVariables.selectedIndex = 0
-                self.tab2.updatePlot()
-                self.tab3.updatePlot()
-                self.tab4.updatePlot()
 
-            newCheckBox.pressed.connect(self.selectFunction)
+            newCheckBox.released.connect(self.selectFunction)
             self.checkBoxGroup.addButton(newCheckBox, listLength - 1)
             
         self.layout.addLayout(self.checkBoxLayout)
@@ -85,6 +88,10 @@ class MainTableWidget(QWidget):
     # Function to set index of the selected function
     def selectFunction(self):
         GlobalVariables.selectedIndex = self.checkBoxGroup.checkedId()
-        self.tab2.updatePlot()
-        self.tab3.updatePlot()
-        self.tab4.updatePlot()
+        if(self.tabs.currentIndex() in self.tabsWithPlots):
+            self.tabs.currentWidget().updatePlot()
+
+    # Function to update Plot of the current tab (must have at least one function added)
+    def updatePlot(self, index):
+        if(index in self.tabsWithPlots and GlobalVariables.selectedIndex != -1):
+            self.tabs.widget(index).updatePlot()

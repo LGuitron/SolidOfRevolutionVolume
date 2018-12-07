@@ -22,14 +22,14 @@ class CalculateVolumeWidget(QWidget):
         self.m           = None
         self.layoutA     = None
         self.labelVolume = QLabel()
-        
+
         self.addedVolumeLabel = False
         
     # Update plot whenever a new function is selected
     def updatePlot(self):
         
         # Add input section when the first function is added
-        if(self.layoutA == None and len(GlobalVariables.mathFunctionsList)==1):
+        if(self.layoutA == None):
             self.layoutA = QVBoxLayout()
             self.layoutA.setDirection(QVBoxLayout.Direction.LeftToRight)
             self.layoutA.addWidget(self.label)
@@ -38,6 +38,7 @@ class CalculateVolumeWidget(QWidget):
         
         if(self.m != None):
             self.layout.removeWidget(self.m)
+            
         self.m = DiskMethodPlot(self)
         
         self.labelVolume.setText("Volumen de cilindros = " + str(self.m.solidVolume))
