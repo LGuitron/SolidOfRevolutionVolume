@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout
 from AddPolinomialWidget import AddPolinomialWidget
-from MathFunction import MathFunction
 
 class AddFunctionWidget(QWidget):
 

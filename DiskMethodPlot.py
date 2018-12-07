@@ -22,8 +22,6 @@ class DiskMethodPlot(FigureCanvas, QWidget):
         
         self.diskAmount  = disks
         self.solidVolume = 0        # Calculate Volume by summing volume of each disk
-        self.startX      = 0
-        self.endX        = 2
         
         fig = Figure()
         #fig = plt.figure()
@@ -32,7 +30,6 @@ class DiskMethodPlot(FigureCanvas, QWidget):
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
 
-        u = np.linspace(self.startX, self.endX, 60)
         self.v = np.linspace(0, 2*np.pi, 60)
         self.plot()
         
@@ -42,12 +39,12 @@ class DiskMethodPlot(FigureCanvas, QWidget):
         d = mathFunction.f_params_dict
         
         # Calculate X coordinate difference of rectangles
-        deltaX = (self.endX - self.startX)/self.diskAmount
+        deltaX = (GlobalVariables.x1 - GlobalVariables.x0)/self.diskAmount
         
         for i in range(self.diskAmount):
             
             # Calculate function value at midpoint
-            midpoint = i*deltaX + 0.5*deltaX
+            midpoint = GlobalVariables.x0 + (i+0.5)*deltaX
             
 
             x_mid       = np.linspace(midpoint, midpoint, 60)          # All X values fixed to midpoint

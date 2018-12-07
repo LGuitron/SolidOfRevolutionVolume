@@ -24,7 +24,7 @@ class SolidRevPlot(FigureCanvas):
                 QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
         
-        u = np.linspace(0, 2, 60)
+        u = np.linspace(GlobalVariables.x0, GlobalVariables.x1, 60)
         v = np.linspace(0, 2*np.pi, 60)
         self.U, self.V = np.meshgrid(u, v)
         self.plot()

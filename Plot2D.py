@@ -27,7 +27,7 @@ class Plot2D(FigureCanvas):
         mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
         d = mathFunction.f_params_dict
         
-        x = np.linspace(0, 10, 100)
+        x = np.linspace(GlobalVariables.x0, GlobalVariables.x1, 100)
         
         
         if(mathFunction.f_type == "polinomial"):

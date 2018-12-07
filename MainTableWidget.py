@@ -93,5 +93,6 @@ class MainTableWidget(QWidget):
 
     # Function to update Plot of the current tab (must have at least one function added)
     def updatePlot(self, index):
+        #print("LEN: ", len(index))
         if(index in self.tabsWithPlots and GlobalVariables.selectedIndex != -1):
             self.tabs.widget(index).updatePlot()
