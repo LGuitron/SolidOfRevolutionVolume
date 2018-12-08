@@ -55,7 +55,7 @@ class AddFunctionWidget(QWidget):
         
         # Show examples
         
-        self.layout.addWidget(QLabel("Introduce una función: \n\nEjemplos: \n\nsin(2*x) \n4*x^3+2*x^2+4*x+1 \ne^(2*x) \nln(x) \narctan(2*x)"))
+        self.layout.addWidget(QLabel("Introduce una función: \n\nEjemplos: \n\nsin(2*x) \n4*x^3+2*x^2+4*x+1 \nexp(2*x) \nln(x) \narctan(2*x \nx^(1/2))"))
         self.layout.addLayout(self.layoutInput)
         self.layout.addWidget(self.currentFunctionText)
         self.layout.addWidget(self.addPartButton)

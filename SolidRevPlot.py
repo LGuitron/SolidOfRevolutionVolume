@@ -12,7 +12,7 @@ class SolidRevPlot(FigureCanvas):
 
     def __init__(self, parent=None):
         
-        self.function_points = 100
+        self.function_points = 500
         
         fig = Figure()
         #fig = plt.figure()
