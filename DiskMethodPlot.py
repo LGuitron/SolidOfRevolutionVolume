@@ -40,17 +40,24 @@ class DiskMethodPlot(FigureCanvas, QWidget):
     def plot(self):
 
         mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
-        deltaX = (GlobalVariables.x1 - GlobalVariables.x0)/self.diskAmount                # Calculate X coordinate difference of rectangles
+        
+        x0 = mathFunction[0].x0
+        x1 = mathFunction[len(mathFunction)-1].x1
+        deltaX = (x1 - x0)/self.diskAmount                # Calculate X coordinate difference of rectangles
         
         for i in range(self.diskAmount):            
             # Calculate function value at midpoint
-            midpoint = GlobalVariables.x0 + (i+0.5)*deltaX
+            midpoint = x0 + (i+0.5)*deltaX
 
             x_range     = np.linspace(i*deltaX , (i+1)*deltaX, self.function_points)      # X range for this cylinder
             X_range, V = np.meshgrid(x_range, self.v)
-            
-            # Get value of function for each of the points specified in u
-            radius  = mathFunction.f_expression.subs(var('x'), midpoint)
+
+            # Iterate through the math function to get the part corresponding to the point to be evaluated
+            for part in mathFunction:
+                if(part.x0 <= midpoint and midpoint <= part.x1):
+                    currentPart = part
+                    break
+            radius = currentPart.f_expression.subs(var('x'), midpoint)
             F_vals = np.full((self.function_points, self.function_points), float(radius))
             
             Y = F_vals * np.cos(V)

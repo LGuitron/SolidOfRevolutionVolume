@@ -61,7 +61,11 @@ class MainTableWidget(QWidget):
         i = 0
         for mathFunction in GlobalVariables.mathFunctionsList:
             i += 1
-            stringMathFunctions.append(str(i) + ". " + str(mathFunction))
+            #stringMathFunctions.append(str(i) + ". " + str(mathFunction))
+            stringMathFunctions.append("(F" + str(i) + ")\n")
+            for functionPart in mathFunction:
+                stringMathFunctions.append(str(functionPart) + "\n")
+
 
         self.listWidget.addItems(stringMathFunctions)
         self.listWidget.setMaximumWidth(0.3 * GlobalVariables.screenWidth)
@@ -71,7 +75,7 @@ class MainTableWidget(QWidget):
         
         if(addCheckBox):
             listLength = len(GlobalVariables.mathFunctionsList)
-            newCheckBox = QCheckBox(str(listLength))
+            newCheckBox = QCheckBox("F" + str(listLength))
             self.checkBoxLayout.addWidget(newCheckBox)
             
             # Set the first function added to ON
@@ -93,6 +97,5 @@ class MainTableWidget(QWidget):
 
     # Function to update Plot of the current tab (must have at least one function added)
     def updatePlot(self, index):
-        #print("LEN: ", len(index))
         if(index in self.tabsWithPlots and GlobalVariables.selectedIndex != -1):
             self.tabs.widget(index).updatePlot()

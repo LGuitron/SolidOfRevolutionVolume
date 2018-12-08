@@ -29,13 +29,25 @@ class Plot2D(FigureCanvas):
     def plot(self):
         
         mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
-        
-        x = np.linspace(GlobalVariables.x0, GlobalVariables.x1, self.function_points)
+
+        x0 = mathFunction[0].x0
+        x1 = mathFunction[len(mathFunction)-1].x1
+
+        x = np.linspace(x0, x1, self.function_points)
         y = np.zeros(self.function_points)
 
         for i in range(self.function_points):
-            y[i] = mathFunction.f_expression.subs(var('x'), x[i])
-        
+            
+            # Iterate through the math function to get the part corresponding to the point to be evaluated
+            for part in mathFunction:
+                if(part.x0 <= x[i] and x[i] <= part.x1):
+                    currentPart = part
+                    break
+            y[i] = currentPart.f_expression.subs(var('x'), x[i])
+            
         ax = self.figure.add_subplot(111)
         ax.plot(x,y,'r-')
-        ax.set_title(str(mathFunction))    
+        title = ""
+        for part in mathFunction:
+            title += str(part) + "\n"
+        ax.set_title(title)    
