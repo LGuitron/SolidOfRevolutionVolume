@@ -45,6 +45,8 @@ class DiskMethodPlot(FigureCanvas, QWidget):
         x1 = mathFunction[len(mathFunction)-1].x1
         deltaX = (x1 - x0)/self.diskAmount                # Calculate X coordinate difference of rectangles
         
+        volumeApproximation = 0
+        
         for i in range(self.diskAmount):            
             # Calculate function value at midpoint
             midpoint = x0 + (i+0.5)*deltaX
@@ -66,5 +68,6 @@ class DiskMethodPlot(FigureCanvas, QWidget):
             self.ax.plot_surface(X_range, Y, Z, alpha=0.3, color='red', rstride=6, cstride=12)
             
             # Calculate volume of current cylinder
-            diskVolume = deltaX*math.pi*radius**2
-            self.solidVolume += diskVolume
+            volumeApproximation += radius**2
+        volumeApproximation *= math.pi*deltaX
+        self.solidVolume = volumeApproximation
