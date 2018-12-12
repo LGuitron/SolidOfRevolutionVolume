@@ -1,8 +1,9 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout,QLabel, QLineEdit
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout,QLabel, QLineEdit, QPushButton
 from PyQt5.QtGui import QIntValidator, QPixmap
 from GlobalVariables import GlobalVariables
 from DiskMethodPlot import DiskMethodPlot
 from matplotlib import pylab, pyplot
+from DiskMethodInteractivePlot import DiskMethodInteractivePlot
 
 class DiskMethodWidget(QWidget):
  
@@ -19,7 +20,7 @@ class DiskMethodWidget(QWidget):
         
         # Get user input for number of disks
         self.label = QLabel()
-        self.label.setText("Número de discos =")
+        self.label.setText("Número de discos (Entre 1 y 999) =")
         
         self.input_section = QLineEdit()
         self.input_section.setValidator(QIntValidator(1,999))
@@ -28,9 +29,11 @@ class DiskMethodWidget(QWidget):
 
         self.m              = None
         self.layoutA        = None
-        self.labelVolume    = QLabel()
 
         self.addedVolumeLabel = False
+        self.interactiveGraph = None
+        self.interactiveGraphButton = None
+        
         
     # Update plot whenever a new function is selected
     def updatePlot(self):
@@ -65,9 +68,6 @@ class DiskMethodWidget(QWidget):
         self.deltaxEquation.setPixmap(QPixmap('equations/formula_deltax.png'))
         self.radiusEquation.setPixmap(QPixmap('equations/formula_radius.png'))
         self.volumeEquation.setPixmap(QPixmap('equations/formula_volume.png'))
-        
-        
-        #self.labelVolume.setText("Volumen de cilindros = " + str(self.m.solidVolume))
 
         # Add Widgets for volume approximation only once
         if(not self.addedVolumeLabel):
@@ -76,9 +76,17 @@ class DiskMethodWidget(QWidget):
             self.layoutFormulas.addWidget(self.radiusEquation)
             self.layout.addLayout(self.layoutFormulas)
             self.layout.addWidget(self.volumeEquation)
-            #self.layout.addWidget(self.labelVolume)
             
         self.layout.addWidget(self.m)
+        
+        # Button for opening interactive plot
+        if(self.interactiveGraphButton != None):
+            self.layout.removeWidget(self.interactiveGraphButton)
+
+        self.interactiveGraphButton = QPushButton("Abrir gráfica Interactiva")
+        self.interactiveGraphButton.clicked.connect(self.openInteractivePlot)
+        self.layout.addWidget(self.interactiveGraphButton)
+
         self.setLayout(self.layout)        
 
     # Helper Function creating equations png files
@@ -102,3 +110,11 @@ class DiskMethodWidget(QWidget):
         # Save the adjusted text.
         fig.savefig(savedir, dpi=dpi)
         pyplot.close(fig)
+        
+    def openInteractivePlot(self):
+        if(self.interactiveGraph != None):
+            self.layout.removeWidget(self.interactiveGraph)
+        
+        self.interactiveGraph = DiskMethodInteractivePlot(self)
+        self.layout.addWidget(self.interactiveGraph)
+

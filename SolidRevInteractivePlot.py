@@ -5,25 +5,17 @@ from GlobalVariables import GlobalVariables
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d.axes3d as axes3d
 from PyQt5.QtWidgets import QWidget, QSizePolicy
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
 
-class SolidRevPlot(FigureCanvas):
+class SolidRevInteractivePlot(QWidget):
 
     def __init__(self, parent=None):
         
-        self.function_points = 500
+        super(QWidget, self).__init__(parent)
         
-        fig = Figure()
+        fig = plt.figure()
         self.ax = fig.add_subplot(1, 1, 1, projection='3d')
-
-        FigureCanvas.__init__(self, fig)
-        self.setParent(parent)
-            
-        FigureCanvas.setSizePolicy(self,
-                QSizePolicy.Expanding,
-                QSizePolicy.Expanding)
-        FigureCanvas.updateGeometry(self)
+        
+        self.function_points = 60
 
         self.plot()
         
