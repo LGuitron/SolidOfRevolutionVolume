@@ -4,6 +4,7 @@ from GlobalVariables import GlobalVariables
 from DiskMethodPlot import DiskMethodPlot
 from matplotlib import pylab, pyplot
 from DiskMethodInteractivePlot import DiskMethodInteractivePlot
+from SolidRevCalculations import calculateCoordinates, calculateVolume
 
 class DiskMethodWidget(QWidget):
  
@@ -20,10 +21,10 @@ class DiskMethodWidget(QWidget):
         
         # Get user input for number of disks
         self.label = QLabel()
-        self.label.setText("Número de discos (Entre 1 y 999) =")
+        self.label.setText("Número de discos (Entre 1 y 9999)=")
         
         self.input_section = QLineEdit()
-        self.input_section.setValidator(QIntValidator(1,999))
+        self.input_section.setValidator(QIntValidator(1, 9999))
         self.input_section.setText("5")
         self.input_section.textChanged.connect(self.updatePlot)
 
@@ -34,6 +35,19 @@ class DiskMethodWidget(QWidget):
         self.interactiveGraph = None
         self.interactiveGraphButton = None
         
+        self.function_points = 100           # Points displayed in circle perimeter
+        
+        # X, Y, and Z coordinates to be plotted
+        self.X = None
+        self.Y = None
+        self.Z = None
+        
+        # Disks to be displayed and disks for volume approximation
+        self.maxDisplayedDisks   = 100
+        self.displayedDisks      = 0
+        self.diskAmount          = 0
+        
+        self.volumeApproximation = 0 
         
     # Update plot whenever a new function is selected
     def updatePlot(self):
@@ -46,23 +60,38 @@ class DiskMethodWidget(QWidget):
             self.layoutA.addWidget(self.input_section)
             self.layout.addLayout(self.layoutA)
         
+        # Force a minimum of 1 disk
+        if(self.input_section.text()=='' or int(self.input_section.text())==0):
+            self.diskAmount = 1
+        else:
+            self.diskAmount = int(self.input_section.text())
+        
+        # Set the number of displayed disks considering the max amount allowed
+        self.displayedDisks = min(self.diskAmount, self.maxDisplayedDisks)
+        
+        # Get currently selected function
+        mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
+        x0           = mathFunction[0].x0
+        x1           = mathFunction[len(mathFunction)-1].x1
+        deltax       = (x1-x0)/self.displayedDisks
+
+        # Calculate X, Y, and Z arrays for plots, and calculate volume approximation
+        self.X, self.Y, self.Z   = calculateCoordinates(mathFunction, self.displayedDisks, self.function_points)
+        self.volumeApproximation = calculateVolume(mathFunction, self.diskAmount)
+        
         if(self.m != None):
             self.layout.removeWidget(self.m)
             
         self.m = DiskMethodPlot(self)
+
         
         # Calculate approximation for cylinder volume and write equations
-        mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
-        x0           = mathFunction[0].x0
-        x1           = mathFunction[len(mathFunction)-1].x1
-        deltax       = (x1-x0)/self.m.diskAmount
-        
         # Create equations png files
-        self.createLatexFormula(r'$\Delta x = \frac{x_1-x_0}{n} = \frac{'+ str.format('{0:.3f}', x1) + '-' + str.format('{0:.3f}', x0) +'}{'+ str(self.m.diskAmount) +'} = ' + str.format('{0:.3f}', deltax) + '$', 'equations/formula_deltax.png', 120)
+        self.createLatexFormula(r'$\Delta x = \frac{x_1-x_0}{n} = \frac{'+ str.format('{0:.4f}', x1) + '-' + str.format('{0:.4}', x0) +'}{'+ str(self.diskAmount) +'} = ' + str.format('{0:.4f}', deltax) + '$', 'equations/formula_deltax.png', 120)
         
-        self.createLatexFormula(r'$r_i = f \left(x_0 + \Delta x(i - \frac{1}{2}) \right) = f \left('+ str.format('{0:.3f}',x0) + '+' + str.format('{0:.3f}',deltax) +'(i - ' +r'\frac{1}{2})\right)$', 'equations/formula_radius.png', 120)
+        self.createLatexFormula(r'$r_i = f \left(x_0 + \Delta x(i - \frac{1}{2}) \right) = f \left('+ str.format('{0:.4f}',x0) + '+' + str.format('{0:.4f}',deltax) +'(i - ' +r'\frac{1}{2})\right)$', 'equations/formula_radius.png', 120)
         
-        self.createLatexFormula(r'$V \approx \pi \Delta x \sum_i^n r_i^2$ = ' + str(self.m.solidVolume), 'equations/formula_volume.png', 120)
+        self.createLatexFormula(r'$V \approx \pi \Delta x \sum_i^n r_i^2$ = ' + str(self.volumeApproximation), 'equations/formula_volume.png', 120)
         
         # Set Equation QPixmaps
         self.deltaxEquation.setPixmap(QPixmap('equations/formula_deltax.png'))
@@ -117,4 +146,3 @@ class DiskMethodWidget(QWidget):
         
         self.interactiveGraph = DiskMethodInteractivePlot(self)
         self.layout.addWidget(self.interactiveGraph)
-
