@@ -36,16 +36,16 @@ class DiskMethodWidget(QWidget):
         self.interactiveGraph = None
         self.interactiveGraphButton = None
         
-        self.function_circle_points = 30    # Points displayed in circle perimeter
+        self.function_circle_points = 15    # Points displayed in circle perimeter
         self.function_x_points      = 2     # X points to display per each cylinder
         
         # X, Y, and Z coordinates to be plotted
         self.X = None
         self.Y = None
         self.Z = None
-        
+
         # Disks to be displayed and disks for volume approximation
-        self.maxDisplayedDisks   = 99
+        self.maxDisplayedDisks   = 200
         self.displayedDisks      = 0
         self.diskAmount          = 0
 

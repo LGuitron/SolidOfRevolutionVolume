@@ -1,6 +1,7 @@
 from sympy import var
 from sympy import lambdify
 import numpy as np
+import datetime
 
 # Calculate X, Y, and Z coordinates for solid of revolution
 def calculateCoordinatesSolidRev(mathFunction, function_circle_points, function_x_points):
@@ -38,7 +39,7 @@ def calculateCoordinatesSolidRev(mathFunction, function_circle_points, function_
 # Calculate X, Y, and Z coordinates to be plotted
 # Disk amount is the amount of disks to be displayed
 def calculateCoordinates(mathFunction, diskAmount, function_circle_points, function_x_points):
-    
+
     v = np.linspace(0, 2*np.pi, function_circle_points)
     x0 = mathFunction[0].x0
     x1 = mathFunction[len(mathFunction)-1].x1
@@ -72,6 +73,7 @@ def calculateCoordinates(mathFunction, diskAmount, function_circle_points, funct
         currentIndex += x_amount
 
     return X, Y, Z
+
 
 # Calculate volume given number of disks
 def calculateVolume(mathFunction, diskAmount):
