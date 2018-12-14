@@ -14,7 +14,8 @@ class SolidRevWidget(QWidget):
         self.interactiveGraph = None
         self.interactiveGraphButton = None
         
-        self.function_points = 300           # Points displayed in circle perimeter
+        self.function_circle_points = 30        # Points displayed in circle perimeter
+        self.function_x_points      = 1000       # Points to be displayed along x axis
         
         # X, Y, and Z coordinates to be plotted
         self.X = None
@@ -30,7 +31,7 @@ class SolidRevWidget(QWidget):
         
         # Get currently selected function
         mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
-        self.X, self.Y, self.Z   = calculateCoordinatesSolidRev(mathFunction, self.function_points)
+        self.X, self.Y, self.Z   = calculateCoordinatesSolidRev(mathFunction, self.function_circle_points, self.function_x_points)
         
         self.m = SolidRevPlot(self)
         self.layout.addWidget(self.m)

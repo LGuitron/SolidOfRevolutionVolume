@@ -11,8 +11,8 @@ class DiskMethodWidget(QWidget):
     def __init__(self, parent):
         
         super(QWidget, self).__init__(parent)
-        self.layout = QVBoxLayout(self)
-        self.layoutFormulas = QHBoxLayout(self)
+        self.layout = QVBoxLayout()
+        self.layoutFormulas = QHBoxLayout()
         
         # Display equation for volume aproximation by this method
         self.deltaxEquation = QLabel()
@@ -21,21 +21,23 @@ class DiskMethodWidget(QWidget):
         
         # Get user input for number of disks
         self.label = QLabel()
-        self.label.setText("Número de discos (Entre 1 y 9999)=")
+        self.label.setText("Número de discos (Entre 1 y 999,999)=")
         
         self.input_section = QLineEdit()
-        self.input_section.setValidator(QIntValidator(1, 9999))
+        self.input_section.setValidator(QIntValidator(1, 999999))
         self.input_section.setText("5")
         self.input_section.textChanged.connect(self.updatePlot)
 
         self.m              = None
         self.layoutA        = None
-
+        self.layoutPlot     = None          # Layout that includes button and plot widgets
+        
         self.addedVolumeLabel = False
         self.interactiveGraph = None
         self.interactiveGraphButton = None
         
-        self.function_points = 100           # Points displayed in circle perimeter
+        self.function_circle_points = 30    # Points displayed in circle perimeter
+        self.function_x_points      = 2     # X points to display per each cylinder
         
         # X, Y, and Z coordinates to be plotted
         self.X = None
@@ -43,14 +45,23 @@ class DiskMethodWidget(QWidget):
         self.Z = None
         
         # Disks to be displayed and disks for volume approximation
-        self.maxDisplayedDisks   = 100
+        self.maxDisplayedDisks   = 99
         self.displayedDisks      = 0
         self.diskAmount          = 0
-        
+
         self.volumeApproximation = 0 
+        
+        # Currently displayed math function
+        self.mathFunction = None
+        
+        # Booleans to determine if plot has been completed and other calculations have been made
+        self.plotCompleted         = False
+        self.calculationsCompleted = False
         
     # Update plot whenever a new function is selected
     def updatePlot(self):
+
+        self.input_section.setReadOnly(True)
         
         # Add input section when the first function is added
         if(self.layoutA == None):
@@ -59,31 +70,39 @@ class DiskMethodWidget(QWidget):
             self.layoutA.addWidget(self.label)
             self.layoutA.addWidget(self.input_section)
             self.layout.addLayout(self.layoutA)
-        
+            
         # Force a minimum of 1 disk
         if(self.input_section.text()=='' or int(self.input_section.text())==0):
             self.diskAmount = 1
         else:
             self.diskAmount = int(self.input_section.text())
         
-        # Set the number of displayed disks considering the max amount allowed
-        self.displayedDisks = min(self.diskAmount, self.maxDisplayedDisks)
+        # Determine if the amount of disks plotted has changed in order to refresh the plot
+        refreshPlot = False
+        if(self.displayedDisks != min(self.diskAmount, self.maxDisplayedDisks)):
+            self.displayedDisks = min(self.diskAmount, self.maxDisplayedDisks)
+            refreshPlot = True
         
         # Get currently selected function
-        mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
-        x0           = mathFunction[0].x0
-        x1           = mathFunction[len(mathFunction)-1].x1
+        if(self.mathFunction != GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]):
+            self.mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
+            refreshPlot = True
+
+        x0           = self.mathFunction[0].x0
+        x1           = self.mathFunction[len(self.mathFunction)-1].x1
         deltax       = (x1-x0)/self.displayedDisks
 
-        # Calculate X, Y, and Z arrays for plots, and calculate volume approximation
-        self.X, self.Y, self.Z   = calculateCoordinates(mathFunction, self.displayedDisks, self.function_points)
-        self.volumeApproximation = calculateVolume(mathFunction, self.diskAmount)
+        # Calculate volume Approximation
+        self.volumeApproximation = calculateVolume(self.mathFunction, self.diskAmount)
         
-        if(self.m != None):
-            self.layout.removeWidget(self.m)
-            
-        self.m = DiskMethodPlot(self)
-
+        if(refreshPlot):
+            # Calculate X, Y, and Z coordinates for plots
+            self.X, self.Y, self.Z   = calculateCoordinates(self.mathFunction, self.displayedDisks, self.function_circle_points, self.function_x_points)
+            if(self.m != None):
+                self.layoutPlot.removeWidget(self.m)
+            self.m = DiskMethodPlot(self)
+        else:
+            self.plotCompleted = True
         
         # Calculate approximation for cylinder volume and write equations
         # Create equations png files
@@ -105,19 +124,22 @@ class DiskMethodWidget(QWidget):
             self.layoutFormulas.addWidget(self.radiusEquation)
             self.layout.addLayout(self.layoutFormulas)
             self.layout.addWidget(self.volumeEquation)
-            
-        self.layout.addWidget(self.m)
         
-        # Button for opening interactive plot
-        if(self.interactiveGraphButton != None):
-            self.layout.removeWidget(self.interactiveGraphButton)
-
-        self.interactiveGraphButton = QPushButton("Abrir gráfica Interactiva")
-        self.interactiveGraphButton.clicked.connect(self.openInteractivePlot)
-        self.layout.addWidget(self.interactiveGraphButton)
-
-        self.setLayout(self.layout)        
-
+        
+        # Layout that includes button and plot widgets
+        if(self.layoutPlot == None):
+            self.layoutPlot = QVBoxLayout()
+            self.layoutPlot.setDirection(QVBoxLayout.Direction.BottomToTop)
+            self.interactiveGraphButton = QPushButton("Abrir gráfica Interactiva")
+            self.interactiveGraphButton.clicked.connect(self.openInteractivePlot)
+            self.layoutPlot.addWidget(self.interactiveGraphButton)    
+            self.layout.addLayout(self.layoutPlot)
+        
+        self.layoutPlot.addWidget(self.m)
+        self.setLayout(self.layout)
+        self.input_section.setReadOnly(False)
+        
+        
     # Helper Function creating equations png files
     def createLatexFormula(self, formula, savedir, dpi):
         fig = pylab.figure()

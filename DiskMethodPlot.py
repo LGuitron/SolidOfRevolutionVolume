@@ -14,7 +14,7 @@ class DiskMethodPlot(FigureCanvas, QWidget):
         fig = Figure()
         self.ax = fig.add_subplot(1, 1, 1, projection='3d')
         FigureCanvas.__init__(self, fig)
-        self.setParent(parent)
+        #self.setParent(parent)
 
         FigureCanvas.setSizePolicy(self, QSizePolicy.Expanding,QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
