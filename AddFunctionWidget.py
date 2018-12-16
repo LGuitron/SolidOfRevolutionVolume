@@ -107,7 +107,13 @@ class AddFunctionWidget(QWidget):
                 x1 = 0
             else:
                 x1 = float(self.x1.text())
-
+            
+            
+            # Make sure x1 is at least a bit higher than x0
+            if(x1 <= x0):
+                x1 = x0 + 0.00001
+            
+            
             # Append last part to the currentFunction List
             newMathFunction = MathFunction(f_expression, x0, x1)
             self.currentFunction.append(newMathFunction)

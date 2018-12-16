@@ -103,17 +103,17 @@ class DiskMethodWidget(QWidget):
         
         # Calculate approximation for cylinder volume and write equations
         # Create equations png files
-        createLatexFormula(r'$\Delta x = \frac{x_1-x_0}{n} = \frac{'+ str.format('{0:.4f}', x1) + '-' + str.format('{0:.4}', x0) +'}{'+ str(self.diskAmount) +'} = ' + str.format('{0:.4f}', deltax) + '$', 'equations/formula_deltax.png', 120)
+        createLatexFormula(r'$\Delta x = \frac{x_1-x_0}{n} = \frac{'+ str.format('{0:.4f}', x1) + '-' + str.format('{0:.4}', x0) +'}{'+ str(self.diskAmount) +'} = ' + str.format('{0:.4f}', deltax) + '$', 'equations/formula_deltax.png', 100)
         
-        createLatexFormula(r'$r_i = f \left(x_0 + \Delta x(i - \frac{1}{2}) \right) = f \left('+ str.format('{0:.4f}',x0) + '+' + str.format('{0:.4f}',deltax) +'(i - ' +r'\frac{1}{2})\right)$', 'equations/formula_radius.png', 120)
+        createLatexFormula(r'$r_i = f \left(x_0 + \Delta x(i - \frac{1}{2}) \right) = f \left('+ str.format('{0:.4f}',x0) + '+' + str.format('{0:.4f}',deltax) +'(i - ' +r'\frac{1}{2})\right)$', 'equations/formula_radius.png', 100)
         
-        createLatexFormula(r'$V \approx \pi \Delta x \sum_i^n r_i^2$ = ' + str(self.volumeApproximation), 'equations/formula_volume.png', 120)
+        createLatexFormula(r'$V \approx \pi \Delta x \sum_i^n r_i^2$ = ' + str(self.volumeApproximation), 'equations/formula_volume.png', 100)
         
         # Set Equation QPixmaps
         self.deltaxEquation.setPixmap(QPixmap('equations/formula_deltax.png'))
         self.radiusEquation.setPixmap(QPixmap('equations/formula_radius.png'))
         self.volumeEquation.setPixmap(QPixmap('equations/formula_volume.png'))
-
+        
         # Add Widgets for volume approximation only once
         if(not self.addedVolumeLabel):
             self.addedVolumeLabel = True

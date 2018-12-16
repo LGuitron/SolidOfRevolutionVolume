@@ -62,9 +62,10 @@ class DefiniteIntegralWidget(QWidget):
             
             
             # Generate Latex formula for current part and diplay it
-            createLatexFormula(r'$Volumen_{parte' +  str(i) +'} = \pi \int_{'+ str(part.x0) +'}^{'+str(part.x1)+'}'+ latex(radius_squared)+r'dx = \pi \left.'+latex(integral)+ r'\right\vert_{'+str(part.x0)+'}^{'+str(part.x1)+'} = '+str(partVolume)+'$', 'equations/part'+ str(i)+'.png', 120)
+            createLatexFormula(r'$Volumen_{parte' +  str(i) +'} = \pi \int_{'+ str(part.x0) +'}^{'+str(part.x1)+'}'+ latex(radius_squared)+r'dx = \pi \left.'+latex(integral)+ r'\right\vert_{'+str(part.x0)+'}^{'+str(part.x1)+'} = '+latex(partVolume)+'$', 'equations/part'+ str(i)+'.png', 100)
             
             part_label.setPixmap(QPixmap('equations/part'+ str(i)+'.png'))
+            part_label.setMaximumWidth(0.5 * GlobalVariables.screenWidth)
             
             i += 1
             
@@ -73,12 +74,15 @@ class DefiniteIntegralWidget(QWidget):
             self.topLayout.addWidget(self.labelParts[len(self.labelParts)-1])
         
         # Generate Latex formula for results part and diplay it
-        createLatexFormula(r'$Volumen_{exacto} = '+str(self.exactVolume)+'$', 'equations/exactVolume.png', 120)
-        createLatexFormula(r'$Volumen_{redondeado} = '+str(float(self.exactVolume))+'$', 'equations/approxVolume.png', 120)
-        
+        createLatexFormula(r'$Volumen_{exacto} = '+latex(self.exactVolume)+'$', 'equations/exactVolume.png', 100)
         self.labelVolume.setPixmap(QPixmap('equations/exactVolume.png'))
-        self.roundedVolume.setPixmap(QPixmap('equations/approxVolume.png'))
+        self.labelVolume.setMaximumWidth(0.5 * GlobalVariables.screenWidth)
         
-        
+        try:
+            createLatexFormula(r'$Volumen_{redondeado} = '+latex(float(self.exactVolume))+'$', 'equations/approxVolume.png', 100)
+            self.roundedVolume.setPixmap(QPixmap('equations/approxVolume.png'))
+            self.roundedVolume.setMaximumWidth(0.5 * GlobalVariables.screenWidth)
+        except:
+            self.roundedVolume = QLabel()
         
         self.setLayout(self.layout)
