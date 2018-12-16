@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QTabWidget,QVBoxLayout, QListWidget, QCheckBox, QButtonGroup
+from PyQt5.QtWidgets import QWidget, QTabWidget,QVBoxLayout, QCheckBox, QButtonGroup, QLabel, QListWidgetItem, QListView, QTableWidget, QHeaderView
+from PyQt5.QtGui import QPixmap, QIcon
 from AddFunctionWidget import AddFunctionWidget
 from FunctionPlotWidget import FunctionPlotWidget
 from SolidRevWidget import SolidRevWidget
 from CalculateVolumeWidget import CalculateVolumeWidget
 from GlobalVariables import GlobalVariables
-
 
 class MainTableWidget(QWidget):        
  
@@ -37,58 +37,78 @@ class MainTableWidget(QWidget):
         self.layout.addWidget(self.tabs)
         
         # Objects changing when adding new math functions
-        self.listWidget = None
+        self.listWidget   = None
+        self.tableWidget  = None
+        
         self.checkBoxLayout = QVBoxLayout()
         self.checkBoxGroup = QButtonGroup()
         self.updateListWidget()
     
     # Function for updatting math functions widget when new functions are added
     def updateListWidget(self, addCheckBox = False):
-        
+    
         # Delete existing layouts
-        if(self.listWidget != None):
-            self.layout.removeWidget(self.listWidget)
+        if(self.tableWidget != None):
+            self.layout.removeWidget(self.tableWidget)
         
-        # Delete existing layouts
-        if(self.checkBoxLayout != None):
-            self.layout.removeItem(self.checkBoxLayout)
+        listLength = len(GlobalVariables.mathFunctionsList)
+        # Row added for each function, and row added for each function part
+        rowAmount = listLength
         
-        # Add list of math functions on the right side
-        self.listWidget = QListWidget()
-        
-        stringMathFunctions = []
-        
-        i = 0
         for mathFunction in GlobalVariables.mathFunctionsList:
-            i += 1
-            #stringMathFunctions.append(str(i) + ". " + str(mathFunction))
-            stringMathFunctions.append("(F" + str(i) + ")\n")
-            for functionPart in mathFunction:
-                stringMathFunctions.append(str(functionPart) + "\n")
-
-
-        self.listWidget.addItems(stringMathFunctions)
-        self.listWidget.setMaximumWidth(0.3 * GlobalVariables.screenWidth)
-        
-        self.layout.addWidget(self.listWidget)
+            rowAmount += len(mathFunction)
         
         
-        if(addCheckBox):
-            listLength = len(GlobalVariables.mathFunctionsList)
-            newCheckBox = QCheckBox("F" + str(listLength))
-            self.checkBoxLayout.addWidget(newCheckBox)
+        self.tableWidget = QTableWidget(rowAmount, 2, self)
+        header = self.tableWidget.horizontalHeader()       
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        
+        
+        rowIndex = 0
+        for i in range(listLength):
+            mathFunction = GlobalVariables.mathFunctionsList[i]
             
-            # Set the first function added to ON
+            rowLabel = QLabel()
+            rowLabel.setText("F" + str(i+1))
+            self.tableWidget.setCellWidget(rowIndex, 0, rowLabel)            # Add name of this function as a whole
+            self.tableWidget.setSpan(rowIndex, 1, len(mathFunction) + 1, 1)  # Mix rows depending on number of parts of this function
+            
+            # Add Checkbox for this function
+            newCheckBox = QCheckBox("F" + str(i+1))
+            newCheckBox.released.connect(self.selectFunction)
+            
+            # Set first checkbox to be on
             if(listLength==1):
                 newCheckBox.setChecked(True)
                 GlobalVariables.selectedIndex = 0
-
-            newCheckBox.released.connect(self.selectFunction)
-            self.checkBoxGroup.addButton(newCheckBox, listLength - 1)
             
-        self.layout.addLayout(self.checkBoxLayout)
+            # Set the currently selected Checkbox
+            if(GlobalVariables.selectedIndex == i):
+                newCheckBox.setChecked(True)
+                
+            self.tableWidget.setCellWidget(rowIndex, 1, newCheckBox)
+            self.checkBoxGroup.addButton(newCheckBox, i)
+            
+                                                                             
+            rowIndex += 1
+
+            for j in range(rowIndex, rowIndex + len(mathFunction)):
+                part = mathFunction[j-rowIndex]
+                partLabel = QLabel()
+                partLabel.setText(str(part))
+                self.tableWidget.setCellWidget(j, 0, partLabel)       # Add name of this function as a whole
+                
+            
+            rowIndex += len(mathFunction)
+            
+        self.tableWidget.setMaximumWidth(0.4 * GlobalVariables.screenWidth)
+        self.layout.addWidget(self.tableWidget)
         self.setLayout(self.layout)
-        
+
+
+
+
     # Function to set index of the selected function
     def selectFunction(self):
         GlobalVariables.selectedIndex = self.checkBoxGroup.checkedId()
@@ -99,3 +119,12 @@ class MainTableWidget(QWidget):
     def updatePlot(self, index):
         if(index in self.tabsWithPlots and GlobalVariables.selectedIndex != -1):
             self.tabs.widget(index).updatePlot()
+
+
+
+class ImgWidget1(QLabel):
+
+    def __init__(self, parent=None, imagePath=None):
+        super(ImgWidget1, self).__init__(parent)
+        pic = QPixmap(imagePath)
+        self.setPixmap(pic)

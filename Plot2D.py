@@ -46,8 +46,6 @@ class Plot2D(FigureCanvas):
             y[i] = currentPart.f_expression.subs(var('x'), x[i])
             
         ax = self.figure.add_subplot(111)
-        ax.plot(x,y,'r-')
-        title = ""
-        for part in mathFunction:
-            title += str(part) + "\n"
-        ax.set_title(title)    
+        ax.plot(x,y,'r-') 
+        ax.set_title("F"+str(GlobalVariables.selectedIndex+1))
+

@@ -2,9 +2,9 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout,QLabel, QLineEdit,
 from PyQt5.QtGui import QIntValidator, QPixmap
 from GlobalVariables import GlobalVariables
 from DiskMethodPlot import DiskMethodPlot
-from matplotlib import pylab, pyplot
 from DiskMethodInteractivePlot import DiskMethodInteractivePlot
 from SolidRevCalculations import calculateCoordinates, calculateVolume
+from LatexFormulas import createLatexFormula
 
 class DiskMethodWidget(QWidget):
  
@@ -57,6 +57,9 @@ class DiskMethodWidget(QWidget):
     # Update plot whenever a new function is selected
     def updatePlot(self):
 
+        if(len(GlobalVariables.mathFunctionsList)==0):
+            return
+            
         self.input_section.setReadOnly(True)
         
         # Add input section when the first function is added
@@ -100,11 +103,11 @@ class DiskMethodWidget(QWidget):
         
         # Calculate approximation for cylinder volume and write equations
         # Create equations png files
-        self.createLatexFormula(r'$\Delta x = \frac{x_1-x_0}{n} = \frac{'+ str.format('{0:.4f}', x1) + '-' + str.format('{0:.4}', x0) +'}{'+ str(self.diskAmount) +'} = ' + str.format('{0:.4f}', deltax) + '$', 'equations/formula_deltax.png', 120)
+        createLatexFormula(r'$\Delta x = \frac{x_1-x_0}{n} = \frac{'+ str.format('{0:.4f}', x1) + '-' + str.format('{0:.4}', x0) +'}{'+ str(self.diskAmount) +'} = ' + str.format('{0:.4f}', deltax) + '$', 'equations/formula_deltax.png', 120)
         
-        self.createLatexFormula(r'$r_i = f \left(x_0 + \Delta x(i - \frac{1}{2}) \right) = f \left('+ str.format('{0:.4f}',x0) + '+' + str.format('{0:.4f}',deltax) +'(i - ' +r'\frac{1}{2})\right)$', 'equations/formula_radius.png', 120)
+        createLatexFormula(r'$r_i = f \left(x_0 + \Delta x(i - \frac{1}{2}) \right) = f \left('+ str.format('{0:.4f}',x0) + '+' + str.format('{0:.4f}',deltax) +'(i - ' +r'\frac{1}{2})\right)$', 'equations/formula_radius.png', 120)
         
-        self.createLatexFormula(r'$V \approx \pi \Delta x \sum_i^n r_i^2$ = ' + str(self.volumeApproximation), 'equations/formula_volume.png', 120)
+        createLatexFormula(r'$V \approx \pi \Delta x \sum_i^n r_i^2$ = ' + str(self.volumeApproximation), 'equations/formula_volume.png', 120)
         
         # Set Equation QPixmaps
         self.deltaxEquation.setPixmap(QPixmap('equations/formula_deltax.png'))
@@ -132,30 +135,7 @@ class DiskMethodWidget(QWidget):
         self.layoutPlot.addWidget(self.m)
         self.setLayout(self.layout)
         self.input_section.setReadOnly(False)
-        
-        
-    # Helper Function creating equations png files
-    def createLatexFormula(self, formula, savedir, dpi):
-        fig = pylab.figure()
-        text = fig.text(0, 0, formula)
-        
-        # Saving the figure will render the text.
-        fig.savefig(savedir, dpi=dpi)
-        
-        # Now we can work with text's bounding box.
-        bbox = text.get_window_extent()
-        width, height = bbox.size / float(dpi) + 0.005
-        # Adjust the figure size so it can hold the entire text.
-        fig.set_size_inches((width, height))
-
-        # Adjust text's vertical position.
-        dy = (bbox.ymin/float(dpi))/height
-        text.set_position((0, -dy))
-
-        # Save the adjusted text.
-        fig.savefig(savedir, dpi=dpi)
-        pyplot.close(fig)
-        
+    
     def openInteractivePlot(self):
         if(self.interactiveGraph != None):
             self.layout.removeWidget(self.interactiveGraph)

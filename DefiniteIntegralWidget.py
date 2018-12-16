@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PyQt5.QtGui import QPixmap
 from GlobalVariables import GlobalVariables
-from sympy import integrate, var
+from LatexFormulas import createLatexFormula
+from sympy import integrate, var, latex
 import numpy as np
 
 class DefiniteIntegralWidget(QWidget):
@@ -26,8 +28,10 @@ class DefiniteIntegralWidget(QWidget):
         
     # Update integral whenever a new function is selected
     def updatePlot(self):
-        self.mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
-        self.calculateIntegrals()
+        
+        if(len(GlobalVariables.mathFunctionsList)>0):
+            self.mathFunction = GlobalVariables.mathFunctionsList[GlobalVariables.selectedIndex]
+            self.calculateIntegrals()
         
 
     # Function for calculating definite integral of each part
@@ -37,7 +41,6 @@ class DefiniteIntegralWidget(QWidget):
             for label in self.labelParts:
                 label.setText("")
                 self.topLayout.removeWidget(label)
-                #self.layout.removeWidget(label)
         
         self.labelParts = []
         self.exactVolume = 0
@@ -57,14 +60,25 @@ class DefiniteIntegralWidget(QWidget):
             # Volume of current part obtained by definite integral and multiplying by PI
             partVolume = np.pi * (evalx1 - evalx0)
             
-            part_label.setText("Volumen Parte " + str(i) + " =     PI * Integral (" +  str(radius_squared) + ")  from " + str(part.x0) + " to " + 
-                               str(part.x1)  + " =         " +  "PI * (" + str(evalx1) + " - " + str(evalx0) + ")  =  " + str(partVolume))
+            
+            # Generate Latex formula for current part and diplay it
+            createLatexFormula(r'$Volumen_{parte' +  str(i) +'} = \pi \int_{'+ str(part.x0) +'}^{'+str(part.x1)+'}'+ latex(radius_squared)+r'dx = \pi \left.'+latex(integral)+ r'\right\vert_{'+str(part.x0)+'}^{'+str(part.x1)+'} = '+str(partVolume)+'$', 'equations/part'+ str(i)+'.png', 120)
+            
+            part_label.setPixmap(QPixmap('equations/part'+ str(i)+'.png'))
+            
             i += 1
             
             self.exactVolume += partVolume
             self.labelParts.append(part_label)
             self.topLayout.addWidget(self.labelParts[len(self.labelParts)-1])
-
-        self.labelVolume.setText("Volumen (Expresión exacta) = " + str(self.exactVolume))
-        self.roundedVolume.setText("Volumen (Redondeado) = " + str(float(self.exactVolume)))
+        
+        # Generate Latex formula for results part and diplay it
+        createLatexFormula(r'$Volumen_{exacto} = '+str(self.exactVolume)+'$', 'equations/exactVolume.png', 120)
+        createLatexFormula(r'$Volumen_{redondeado} = '+str(float(self.exactVolume))+'$', 'equations/approxVolume.png', 120)
+        
+        self.labelVolume.setPixmap(QPixmap('equations/exactVolume.png'))
+        self.roundedVolume.setPixmap(QPixmap('equations/approxVolume.png'))
+        
+        
+        
         self.setLayout(self.layout)
