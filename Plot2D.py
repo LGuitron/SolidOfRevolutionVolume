@@ -47,5 +47,5 @@ class Plot2D(FigureCanvas):
             
         ax = self.figure.add_subplot(111)
         ax.plot(x,y,'r-') 
-        ax.set_title("F"+str(GlobalVariables.selectedIndex+1))
+        ax.set_title("Función "+str(GlobalVariables.selectedIndex+1))
 

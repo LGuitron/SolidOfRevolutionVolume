@@ -2,8 +2,8 @@ from sympy import var
 from sympy import sympify
 
 from PyQt5.QtWidgets import QLineEdit, QLabel, QPushButton, QWidget, QVBoxLayout
-from PyQt5.QtGui import QDoubleValidator
-from PyQt5.QtCore import pyqtSlot, QObject
+from PyQt5.QtGui import QDoubleValidator, QFont
+from PyQt5.QtCore import pyqtSlot, QObject, Qt
 
 from MathFunction import MathFunction
 from GlobalVariables import GlobalVariables
@@ -20,10 +20,17 @@ class AddFunctionWidget(QWidget):
         self.layout = QVBoxLayout(self)
         self.mainTableWidget = parent
         
+        # Text Fonts to be used
+        self.bigTextFont = QFont()
+        self.bigTextFont.setPointSize(16)
+        
+        self.mediumTextFont = QFont()
+        self.mediumTextFont.setPointSize(13)
+        
+        
         # Function Input section
         self.layoutInput = QVBoxLayout()
         self.layoutInput.setDirection(QVBoxLayout.Direction.LeftToRight)
-
         
         # Interval input
         self.input_section = QLineEdit()
@@ -52,14 +59,32 @@ class AddFunctionWidget(QWidget):
         self.acceptButton = QPushButton("Aceptar")
         self.acceptButton.clicked.connect(self.pushFunction)
         
+        # Error messages that can be displayed
+        self.addPartError     = QLabel()
+        self.addFunctionError = QLabel()
+        self.addPartError.setAlignment(Qt.AlignCenter)
+        self.addFunctionError.setAlignment(Qt.AlignCenter)
+        self.addPartError.setStyleSheet('color: red')
+        self.addFunctionError.setStyleSheet('color: red')
         
+        
+        # Page Title
+        self.instructionLabel = QLabel("Introduce una función")
+        self.instructionLabel.setFont(self.bigTextFont)
+        self.instructionLabel.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(self.instructionLabel)
+        
+        #self.layout.addWidget(QLabel("Introduce una función: \n\nEjemplos: \n\nsin(2*x) \n4*x^3+2*x^2+4*x+1 \nexp(2*x) \nln(x) \natan(2*x) \nx^(1/2))"))
         # Show examples
-        
-        self.layout.addWidget(QLabel("Introduce una función: \n\nEjemplos: \n\nsin(2*x) \n4*x^3+2*x^2+4*x+1 \nexp(2*x) \nln(x) \natan(2*x) \nx^(1/2))"))
+        self.layout.addWidget(QLabel("Ejemplos: \n\nsin(2*x) \n4*x^3+2*x^2+4*x+1 \nexp(2*x) \nln(x) \natan(2*x) \nx^(1/2))"))
         self.layout.addLayout(self.layoutInput)
         self.layout.addWidget(self.currentFunctionText)
+        
+        
         self.layout.addWidget(self.addPartButton)
+        self.layout.addWidget(self.addPartError)
         self.layout.addWidget(self.acceptButton)
+        self.layout.addWidget(self.addFunctionError)
 
         self.setLayout(self.layout)
     
@@ -67,32 +92,40 @@ class AddFunctionWidget(QWidget):
     @pyqtSlot()
     def addPart(self):
         
-        # Process inputs from last part
-        f_expression = sympify(self.input_section.text())
+        try:
         
-        
-        if(self.x0.text()=='' or self.x0.text()=='-'):
-            x0 = 0
-        else:
-            x0 = float(self.x0.text())
-        
-        if(self.x1.text()=='' or self.x1.text()=='-'):
-            x1 = 0
-        else:
-            x1 = float(self.x1.text())
+            # Process inputs from last part
+            f_expression = sympify(self.input_section.text())
+            
+            
+            if(self.x0.text()=='' or self.x0.text()=='-'):
+                x0 = 0
+            else:
+                x0 = float(self.x0.text())
+            
+            if(self.x1.text()=='' or self.x1.text()=='-'):
+                x1 = 0
+            else:
+                x1 = float(self.x1.text())
 
-        # Append last part to the currentFunction List
-        newMathFunction = MathFunction(f_expression, x0, x1)
-        self.currentFunction.append(newMathFunction)
-        
-        if(len(self.currentFunction)==1):
-            self.currentFunctionText.setText("Función actual: \n\n")
-        
-        self.currentFunctionText.setText(self.currentFunctionText.text() + str(newMathFunction) + "\n")
+            # Append last part to the currentFunction List
+            newMathFunction = MathFunction(f_expression, x0, x1)
+            self.currentFunction.append(newMathFunction)
+            
+            if(len(self.currentFunction)==1):
+                self.currentFunctionText.setText("Función actual: \n\n")
+            
+            self.currentFunctionText.setText(self.currentFunctionText.text() + str(newMathFunction) + "\n")
 
-        # Lock x0 for next function
-        self.x0.setText(str(newMathFunction.x1))
-        self.x0.setReadOnly(True)
+            # Lock x0 for next function
+            self.x0.setText(str(newMathFunction.x1))
+            self.x0.setReadOnly(True)
+
+            self.addPartError.setText("")
+            
+        except:
+            
+            self.addPartError.setText("Expresión no válida")
         
 
     # Function for adding function to the list of functions
@@ -100,8 +133,13 @@ class AddFunctionWidget(QWidget):
     def pushFunction(self):
         # Add Last part to the current function
         if(len(self.currentFunction)>0):
+            self.addFunctionError.setText("")
             GlobalVariables.mathFunctionsList.append(self.currentFunction)
             self.currentFunction = []
             self.currentFunctionText.setText("")
             self.x0.setReadOnly(False)
             self.mainTableWidget.updateListWidget(True)
+        
+        # Error message, function needs at least one part
+        else:
+            self.addFunctionError.setText("La función debe tener por lo menos 1 parte")

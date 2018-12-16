@@ -1,10 +1,13 @@
-from PyQt5.QtWidgets import QWidget, QTabWidget,QVBoxLayout, QCheckBox, QButtonGroup, QLabel, QListWidgetItem, QListView, QTableWidget, QHeaderView
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtWidgets import QWidget, QTabWidget,QVBoxLayout, QCheckBox, QButtonGroup, QLabel, QTableWidget, QHeaderView
+from PyQt5.QtGui import QPixmap, QIcon, QFont
+from PyQt5.QtCore import Qt
 from AddFunctionWidget import AddFunctionWidget
 from FunctionPlotWidget import FunctionPlotWidget
 from SolidRevWidget import SolidRevWidget
 from CalculateVolumeWidget import CalculateVolumeWidget
 from GlobalVariables import GlobalVariables
+from sympy import latex
+from LatexFormulas import createLatexFormula
 
 class MainTableWidget(QWidget):        
  
@@ -35,15 +38,17 @@ class MainTableWidget(QWidget):
         
         # Add tabs to widget        
         self.layout.addWidget(self.tabs)
-        
-        # Objects changing when adding new math functions
-        self.listWidget   = None
         self.tableWidget  = None
         
-        self.checkBoxLayout = QVBoxLayout()
+        #self.checkBoxLayout = QVBoxLayout()
         self.checkBoxGroup = QButtonGroup()
         self.updateListWidget()
-    
+        
+        # Function to be used for function titles
+        self.functionTitleFont = QFont()
+        self.functionTitleFont.setBold(True)
+        self.functionTitleFont.setPointSize(14)
+        
     # Function for updatting math functions widget when new functions are added
     def updateListWidget(self, addCheckBox = False):
     
@@ -59,20 +64,24 @@ class MainTableWidget(QWidget):
             rowAmount += len(mathFunction)
         
         
-        self.tableWidget = QTableWidget(rowAmount, 2, self)
+        self.tableWidget = QTableWidget(rowAmount, 3, self)
         header = self.tableWidget.horizontalHeader()       
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        
+        header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
         
         rowIndex = 0
         for i in range(listLength):
             mathFunction = GlobalVariables.mathFunctionsList[i]
             
             rowLabel = QLabel()
-            rowLabel.setText("F" + str(i+1))
+            self.tableWidget.setSpan(rowIndex, 0, 1, 2)                      # Mix 2 columns for function title
+            
+            rowLabel.setText("Función " + str(i+1))
+            rowLabel.setFont(self.functionTitleFont)
+            rowLabel.setAlignment(Qt.AlignCenter)
             self.tableWidget.setCellWidget(rowIndex, 0, rowLabel)            # Add name of this function as a whole
-            self.tableWidget.setSpan(rowIndex, 1, len(mathFunction) + 1, 1)  # Mix rows depending on number of parts of this function
+            self.tableWidget.setSpan(rowIndex, 2, len(mathFunction) + 1, 1)  # Mix rows depending on number of parts of this function
             
             # Add Checkbox for this function
             newCheckBox = QCheckBox("F" + str(i+1))
@@ -87,7 +96,7 @@ class MainTableWidget(QWidget):
             if(GlobalVariables.selectedIndex == i):
                 newCheckBox.setChecked(True)
                 
-            self.tableWidget.setCellWidget(rowIndex, 1, newCheckBox)
+            self.tableWidget.setCellWidget(rowIndex, 2, newCheckBox)
             self.checkBoxGroup.addButton(newCheckBox, i)
             
                                                                              
@@ -95,9 +104,16 @@ class MainTableWidget(QWidget):
 
             for j in range(rowIndex, rowIndex + len(mathFunction)):
                 part = mathFunction[j-rowIndex]
+                createLatexFormula(r'$f(x) = '+ latex(part.f_expression) +'$', 'equations/function_part_' + str(j), 90)
+                createLatexFormula(r'$ x \in ('+str(part.x0)+', '+str(part.x1)+')$', 'equations/interval_' + str(j), 90)
+                
                 partLabel = QLabel()
-                partLabel.setText(str(part))
-                self.tableWidget.setCellWidget(j, 0, partLabel)       # Add name of this function as a whole
+                partLabel.setPixmap(QPixmap('equations/function_part_' + str(j)))
+                self.tableWidget.setCellWidget(j, 0, partLabel)
+                
+                partInterval = QLabel()
+                partInterval.setPixmap(QPixmap('equations/interval_' + str(j)))
+                self.tableWidget.setCellWidget(j, 1, partInterval)
                 
             
             rowIndex += len(mathFunction)
@@ -119,12 +135,3 @@ class MainTableWidget(QWidget):
     def updatePlot(self, index):
         if(index in self.tabsWithPlots and GlobalVariables.selectedIndex != -1):
             self.tabs.widget(index).updatePlot()
-
-
-
-class ImgWidget1(QLabel):
-
-    def __init__(self, parent=None, imagePath=None):
-        super(ImgWidget1, self).__init__(parent)
-        pic = QPixmap(imagePath)
-        self.setPixmap(pic)
