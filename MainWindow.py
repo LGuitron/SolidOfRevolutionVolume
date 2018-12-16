@@ -1,8 +1,8 @@
-from PyQt5.QtWidgets import QMainWindow, QAction
+from PyQt5.QtWidgets import QMainWindow, QAction, QWidget, QHBoxLayout, QMenuBar
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot
-
+from PyQt5.QtCore import pyqtSlot, Qt
 from MainTableWidget import MainTableWidget
+import os, shutil
 
 # Main window with navigation
 class MainWindow(QMainWindow):
@@ -18,10 +18,27 @@ class MainWindow(QMainWindow):
     def initUI(self):
         
         mainMenu = self.menuBar() 
-        fileMenu = mainMenu.addMenu('File')
+        menu  = QMenuBar()
+
         exitButton = QAction(QIcon('images/exit.png'), 'Exit', self)
         exitButton.setShortcut('Ctrl+Q')
         exitButton.setStatusTip('Exit application')
-        exitButton.triggered.connect(self.close)
-        fileMenu.addAction(exitButton)
+        exitButton.triggered.connect(self.close_app)
+        menu.addAction(exitButton)
+
+        mainMenu.setCornerWidget(menu)
         self.showFullScreen()
+    
+    # Function to delete equation images after closing the app
+    def close_app(self):
+        folder = 'equations'
+        for the_file in os.listdir(folder):
+            file_path = os.path.join(folder, the_file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                #elif os.path.isdir(file_path): shutil.rmtree(file_path)
+            except Exception as e:
+                print(e)
+                
+        self.close()

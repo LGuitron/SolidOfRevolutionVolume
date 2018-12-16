@@ -32,14 +32,18 @@ class AddFunctionWidget(QWidget):
         self.layoutInput = QVBoxLayout()
         self.layoutInput.setDirection(QVBoxLayout.Direction.LeftToRight)
         
+        self.intervalValidator = QDoubleValidator()
+        self.intervalValidator.setNotation(QDoubleValidator.StandardNotation)
+        self.intervalValidator.setRange(-999999.999,999999.999, 3)
+        
         # Interval input
         self.input_section = QLineEdit()
         self.x0 = QLineEdit()
-        self.x0.setValidator(QDoubleValidator())
+        self.x0.setValidator(self.intervalValidator)
         self.x0.setMaximumWidth(0.1*GlobalVariables.screenWidth)
                 
         self.x1 = QLineEdit()
-        self.x1.setValidator(QDoubleValidator())
+        self.x1.setValidator(self.intervalValidator)
         self.x1.setMaximumWidth(0.1*GlobalVariables.screenWidth)
 
         #self.layoutInput.addWidget(self.labelInfo)

@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QApplication
 from MainWindow import MainWindow
 from GlobalVariables import GlobalVariables
+from PyQt5.QtCore import Qt
 import sys
 
 if __name__ == '__main__':
