@@ -54,10 +54,6 @@ class DiskMethodWidget(QWidget):
         # Currently displayed math function
         self.mathFunction = None
         
-        # Booleans to determine if plot has been completed and other calculations have been made
-        self.plotCompleted         = False
-        self.calculationsCompleted = False
-        
     # Update plot whenever a new function is selected
     def updatePlot(self):
 
@@ -101,8 +97,6 @@ class DiskMethodWidget(QWidget):
             if(self.m != None):
                 self.layoutPlot.removeWidget(self.m)
             self.m = DiskMethodPlot(self)
-        else:
-            self.plotCompleted = True
         
         # Calculate approximation for cylinder volume and write equations
         # Create equations png files
