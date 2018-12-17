@@ -65,7 +65,10 @@ def calculateCoordinates(mathFunction, diskAmount, function_circle_points, funct
         x_amount = len(x_values)
         f        = lambdify("x", part.f_expression, "numpy")
         f_eval   = f(x_values)
-
+        
+        if not isinstance(f_eval, (list,)):
+            f_eval = np.full(x_amount, f_eval)
+        
         for i in range(x_amount):
             F_vals              = np.full((function_circle_points,function_x_points), f_eval[i])    
             Y[currentIndex + i] = F_vals * np.cos(V)
@@ -89,7 +92,11 @@ def calculateVolume(mathFunction, diskAmount):
         x_values = np.arange(part.x0 + 0.5*deltaX, part.x1, deltaX)
         x_amount = len(x_values)
         f        = lambdify("x", part.f_expression, "numpy")
-        volumeApproximation  += np.sum(f(x_values)**2)
+        
+        values   = f(x_values)
+        if not isinstance(values, (list,)):
+            values = np.full(x_amount, values)
+        volumeApproximation  += np.sum(values**2)
 
     volumeApproximation *= np.pi*deltaX
     return volumeApproximation

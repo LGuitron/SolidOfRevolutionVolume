@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PyQt5.QtGui import QPixmap
 from GlobalVariables import GlobalVariables
 from LatexFormulas import createLatexFormula
-from sympy import integrate, var, latex
+from sympy import integrate, var, latex, sympify
 import numpy as np
 
 class DefiniteIntegralWidget(QWidget):
@@ -53,7 +53,13 @@ class DefiniteIntegralWidget(QWidget):
             
             # Integrate this part as function ^ 2 from x0 to x1
             radius_squared = part.f_expression ** 2
-            integral       = integrate(radius_squared)
+            
+            # Check if the expression has an X in order to integrate, otherwise leave it like that
+            if("x" in  str(radius_squared)):
+                integral       = integrate(radius_squared)
+            else:
+                integral       = radius_squared * sympify("x")
+                
             evalx0         = integral.subs(var('x'), part.x0)
             evalx1         = integral.subs(var('x'), part.x1)
             
