@@ -29,7 +29,7 @@ After adding a function expression after the "f(x)" label as well as the interva
 click on the button "Agregar nueva parte", if the inputs are valid the interpreted expression will be
 displayed below the label "Función Actual".
 
-![alt text](https://github.com/LGuitron/SolidOfRevolutionVolume/tree/master/images/InputExample1.png)
+![alt text](https://github.com/LGuitron/SolidOfRevolutionVolume/blob/master/images/InputExample1.png)
 
 
 
