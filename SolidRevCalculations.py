@@ -65,7 +65,14 @@ def calculateCoordinates(mathFunction, diskAmount, function_circle_points, funct
     # Create Lambda Expressions for each function part and evaluate corresponding points
     for part in mathFunction:
 
-        x_values = np.arange(part.x0 + 0.5*deltaX, part.x1 - 0.5*deltaX, deltaX)
+        #x_values = np.arange(part.x0 + 0.5*deltaX, part.x1 - 0.5*deltaX, deltaX)
+        x_values = np.arange(x0_part + 0.5*deltaX, part.x1, deltaX)
+        
+        if(len(x_values)!=0):
+            x0_part  = x_values[len(x_values)-1] + 0.5*deltaX
+        else:
+            x0_part += deltaX 
+        
         x_amount = len(x_values)
         f        = lambdify("x", part.f_expression, "numpy")
         f_eval   = f(x_values)
