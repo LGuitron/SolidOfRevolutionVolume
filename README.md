@@ -19,13 +19,17 @@ The program accepts functions by parts as input for generating solids of revolut
 each of the parts of a function require the function expression, as well as its interval 
 (floating point numbers between -999,999.999 and 999,999.999).
 
-Valid function expressions only have a single variable "x", and are expressions that can be
-sympified with the sympy library. [https://docs.sympy.org/]
+Valid function expressions only have a single variable "x", and are valid expressions according to the sympy library. 
+https://docs.sympy.org/
 
 
 ### Input Example
 
+After adding a function expression after the "f(x)" label as well as the interval of the function
+click on the button "Agregar nueva parte", if the inputs are valid the interpreted expression will be
+displayed below the label "Función Actual".
 
+![alt text](https://github.com/LGuitron/SolidOfRevolutionVolume/tree/master/images/InputExample1.png)
 
 
 
