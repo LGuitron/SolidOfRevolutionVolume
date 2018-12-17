@@ -68,7 +68,7 @@ class DefiniteIntegralWidget(QWidget):
             
             
             # Generate Latex formula for current part and diplay it
-            createLatexFormula(r'$Volumen_{parte' +  str(i) +'} = \pi \int_{'+ str(part.x0) +'}^{'+str(part.x1)+'}'+ latex(radius_squared)+r'dx = \pi \left.'+latex(integral)+ r'\right\vert_{'+str(part.x0)+'}^{'+str(part.x1)+'} = '+latex(partVolume)+'$', 'equations/part'+ str(i)+'.png', 100)
+            createLatexFormula(r'$Volumen_{parte' +  str(i) +'} = \pi \int_{'+ str(part.x0) +'}^{'+str(part.x1)+'}'+ latex(radius_squared)+r'dx = \pi \left('+latex(integral)+ r'\right)\vert_{'+str(part.x0)+'}^{'+str(part.x1)+'} = '+latex(partVolume)+'$', 'equations/part'+ str(i)+'.png', 100)
             
             part_label.setPixmap(QPixmap('equations/part'+ str(i)+'.png'))
             part_label.setMaximumWidth(0.5 * GlobalVariables.screenWidth)
